@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir MP3/MP4 y Obtener Link</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f0ff;
+      text-align: center;
+      padding: 30px;
+    }
+    input[type="file"] {
+      margin: 20px;
+    }
+    #link {
+      margin-top: 20px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sube tu archivo MP3 o MP4</h1>
+  <input type="file" id="fileInput" accept=".mp3,.mp4">
+  <br>
+  <button onclick="uploadFile()">Subir y Obtener Link</button>
+  <p id="status"></p>
+  <p id="link"></p>
+
+  <script>
+    async function uploadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      const status = document.getElementById('status');
+      const link = document.getElementById('link');
+
+      if (!file) {
+        status.textContent = "Selecciona un archivo MP3 o MP4.";
+        return;
+      }
+
+      status.textContent = "Subiendo...";
+      link.textContent = "";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("https://store1.gofile.io/uploadFile", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === "ok") {
+          const fileUrl = data.data.downloadPage;
+          status.textContent = "¡Archivo subido con éxito!";
+          link.innerHTML = `<a href="${fileUrl}" target="_blank">${fileUrl}</a>`;
+        } else {
+          status.textContent = "Error al subir archivo.";
+        }
+      } catch (error) {
+        status.textContent = "Error en la conexión.";
+      }
+    }
+  </script>
+</body>
+</html>
